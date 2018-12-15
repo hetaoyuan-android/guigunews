@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+    </android.support.v4.view.ViewPager>
+    <RadioGroup
+        android:id="@+id/rg_main"
+        android:background="@drawable/bottom_tab_bg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <RadioButton
+            android:id="@+id/rb_home"
+            android:drawableTop="@drawable/rb_home_drawable_selector"
+            android:gravity="center"
+            android:text="@string/home"
+            style="@style/bottom_tag_style"
+            />
+        <RadioButton
+            android:id="@+id/rb_newscenter"
+            android:drawableTop="@drawable/rb_newscenter_selector"
+            android:gravity="center"
+            android:text="@string/newcenter"
+            style="@style/bottom_tag_style"
+            />
+        <RadioButton
+            android:id="@+id/rb_smartservice"
+            android:drawableTop="@drawable/rb_smartservice_selector"
+            android:gravity="center"
+            android:text="@string/smart"
+            style="@style/bottom_tag_style"
+            />
+        <RadioButton
+            android:id="@+id/rb_govaffair"
+            android:drawableTop="@drawable/rb_govaffair_selector"
+            android:gravity="center"
+            android:text="@string/rb_govaffair"
+            style="@style/bottom_tag_style"
+            />
+        <RadioButton
+            android:id="@+id/rb_setting"
+            android:drawableTop="@drawable/rb_setting_selector"
+            android:gravity="center"
+            android:text="@string/setting"
+            style="@style/bottom_tag_style"
+            />
+
+    </RadioGroup>
+</LinearLayout>

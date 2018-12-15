@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">hetao_news</string>
+    <string name="startaction">开始体验</string>
+    <string name="home">主页</string>
+    <string name="newcenter">新闻</string>
+    <string name="smart">智慧</string>
+    <string name="rb_govaffair">政要</string>
+    <string name="setting">设置</string>
+</resources>

@@ -6,6 +6,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.example.a18302.guigu_news.MainActivity;
 import com.example.a18302.guigu_news.R;
 
 public class BasePager {
@@ -21,7 +22,7 @@ public class BasePager {
     public ImageButton ib_menu;
 
     //加载主页面
-    public FrameLayout fl_cntent;
+    public FrameLayout fl_content;
 
     public BasePager(Context context) {
         this.context = context;
@@ -36,7 +37,14 @@ public class BasePager {
         View view = View.inflate(context, R.layout.base_pager,null);
         tv_title = view.findViewById(R.id.tv_title);
         ib_menu = view.findViewById(R.id.ib_menu);
-        fl_cntent = view.findViewById(R.id.fl_content);
+        fl_content = view.findViewById(R.id.fl_content);
+        ib_menu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MainActivity mainActivity = (MainActivity) context;
+                mainActivity.getSlidingMenu().toggle();
+            }
+        });
         return view;
     }
 

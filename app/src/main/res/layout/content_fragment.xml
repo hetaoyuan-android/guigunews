@@ -5,12 +5,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <android.support.v4.view.ViewPager
+    <com.example.a18302.guigu_news.view.NoScrollViewpager
         android:id="@+id/viewpager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
-    </android.support.v4.view.ViewPager>
+    </com.example.a18302.guigu_news.view.NoScrollViewpager>
     <RadioGroup
         android:id="@+id/rg_main"
         android:background="@drawable/bottom_tab_bg"

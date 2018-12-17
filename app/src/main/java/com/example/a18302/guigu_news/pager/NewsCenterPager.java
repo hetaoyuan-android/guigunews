@@ -3,12 +3,18 @@ package com.example.a18302.guigu_news.pager;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.TextView;
 
 import com.example.a18302.guigu_news.MainActivity;
 import com.example.a18302.guigu_news.base.BasePager;
+import com.example.a18302.guigu_news.base.MenuDetailBasePager;
 import com.example.a18302.guigu_news.domain.NewsCenterPagerBean;
 import com.example.a18302.guigu_news.fragment.LeftMenuFragment;
+import com.example.a18302.guigu_news.menudeatailpager.InteracMenuDetailPager;
+import com.example.a18302.guigu_news.menudeatailpager.NewsMenuDetailPager;
+import com.example.a18302.guigu_news.menudeatailpager.PhotosMenuDetailPager;
+import com.example.a18302.guigu_news.menudeatailpager.TopicMenuDetailPager;
 import com.example.a18302.guigu_news.utils.Contants;
 import com.example.a18302.guigu_news.utils.LogUtil;
 import com.google.gson.Gson;
@@ -17,11 +23,15 @@ import org.xutils.common.Callback;
 import org.xutils.http.RequestParams;
 import org.xutils.x;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class NewsCenterPager extends BasePager {
 
     private List<NewsCenterPagerBean.DataEntity> data;
+
+    //详情页面的集合
+    private ArrayList<MenuDetailBasePager> detailBasePagers;
 
     public NewsCenterPager(Context context) {
         super(context);
@@ -91,6 +101,12 @@ public class NewsCenterPager extends BasePager {
         data = bean.getData();
         MainActivity mainActivity = (MainActivity) context;
         LeftMenuFragment leftMenuFragment =  mainActivity.getLeftMenuFragment();
+        //添加详情页面
+        detailBasePagers = new ArrayList<>();
+        detailBasePagers.add(new NewsMenuDetailPager(context));
+        detailBasePagers.add(new TopicMenuDetailPager(context));
+        detailBasePagers.add(new PhotosMenuDetailPager(context));
+        detailBasePagers.add(new InteracMenuDetailPager(context));
         //把数据传递给左侧菜单
         leftMenuFragment.setData(data);
     }
@@ -104,5 +120,22 @@ public class NewsCenterPager extends BasePager {
      */
     private NewsCenterPagerBean parsedJson(String json) {
         return new Gson().fromJson(json,NewsCenterPagerBean.class);
+    }
+
+    /**
+     * 根据位置切换详情页面
+     * @param i
+     */
+    public void swichPager(int i) {
+        //设置标题
+        tv_title.setText(data.get(i).getTitle());
+        //移除之前的内容
+        fl_content.removeAllViews();
+        //添加新的内容
+        MenuDetailBasePager detailBasePager = detailBasePagers.get(i);
+        View rootView = detailBasePager.rootView;
+        detailBasePager.initData();
+
+        fl_content.addView(rootView);
     }
 }

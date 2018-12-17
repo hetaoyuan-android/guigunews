@@ -119,4 +119,12 @@ public class ContentFragment extends BasemenuFragment {
         MainActivity mainActivity = (MainActivity) context;
         mainActivity.getSlidingMenu().setTouchModeAbove(touchmodeFullScreen);
     }
+
+    /**
+     * 得到新闻中心
+     * @return
+     */
+    public NewsCenterPager getNewCtenterPager() {
+        return (NewsCenterPager) basePagers.get(1);
+    }
 }

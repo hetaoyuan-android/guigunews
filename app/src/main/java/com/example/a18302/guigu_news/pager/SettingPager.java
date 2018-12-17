@@ -22,7 +22,7 @@ public class SettingPager extends BasePager {
         tv_title.setText("设置中心");
         //联网请求得到数据
         TextView textView = new TextView(context);
-       textView.setGravity(Gravity.CENTER);
+        textView.setGravity(Gravity.CENTER);
         textView.setTextColor(Color.RED);
         textView.setTextSize(25);
         //子试图添加到basePager的FrameLayout

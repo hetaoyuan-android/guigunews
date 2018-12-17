@@ -76,8 +76,21 @@ public class MainActivity extends SlidingFragmentActivity {
 
     }
 
+    /**
+     * 得到左侧菜单的Fragment
+     * @return
+     */
     public LeftMenuFragment getLeftMenuFragment() {
         FragmentManager fm = getSupportFragmentManager();
         return (LeftMenuFragment) fm.findFragmentByTag(LEFTMENU_TAG);
+    }
+
+    /**
+     * 得到新闻中心的
+     * @return
+     */
+    public ContentFragment getContentFragment() {
+        FragmentManager fm = getSupportFragmentManager();
+        return (ContentFragment) fm.findFragmentByTag(MAIN_CONTENT_TAG);
     }
 }

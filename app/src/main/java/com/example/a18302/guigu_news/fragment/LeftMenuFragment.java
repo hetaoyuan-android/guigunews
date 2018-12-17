@@ -14,6 +14,7 @@ import com.example.a18302.guigu_news.MainActivity;
 import com.example.a18302.guigu_news.R;
 import com.example.a18302.guigu_news.base.BasePager;
 import com.example.a18302.guigu_news.domain.NewsCenterPagerBean;
+import com.example.a18302.guigu_news.pager.NewsCenterPager;
 import com.example.a18302.guigu_news.utils.DensityUtil;
 import com.example.a18302.guigu_news.utils.LogUtil;
 
@@ -25,10 +26,11 @@ public class LeftMenuFragment extends BasemenuFragment {
     private ListView listView;
 
     private int position;
+
     @Override
     public View initView() {
         listView = new ListView(context);
-        listView.setPadding(0, DensityUtil.dip2px(context,40),0,0);
+        listView.setPadding(0, DensityUtil.dip2px(context, 40), 0, 0);
         listView.setDividerHeight(0);
         listView.setCacheColorHint(Color.TRANSPARENT);
         //设置按下的listview的item不变色
@@ -45,9 +47,17 @@ public class LeftMenuFragment extends BasemenuFragment {
                 MainActivity mainActivity = (MainActivity) context;
                 mainActivity.getSlidingMenu().toggle();
                 //3.切换到对应的详情，
+                switchPager(position);
             }
         });
         return listView;
+    }
+
+    private void switchPager(int i) {
+        MainActivity mainActivity = (MainActivity) context;
+        ContentFragment contentFragment = mainActivity.getContentFragment();
+        NewsCenterPager newsCenterPager = contentFragment.getNewCtenterPager();
+        newsCenterPager.swichPager(i);
     }
 
     @Override
@@ -70,9 +80,11 @@ public class LeftMenuFragment extends BasemenuFragment {
         adapter = new LeftmenuFragmentAdapter();
         //设置适配器
         listView.setAdapter(adapter);
+        //设置默认
+        switchPager(position);
     }
 
-    class LeftmenuFragmentAdapter extends BaseAdapter{
+    class LeftmenuFragmentAdapter extends BaseAdapter {
 
         @Override
         public int getCount() {
@@ -91,7 +103,7 @@ public class LeftMenuFragment extends BasemenuFragment {
 
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
-            TextView textView = (TextView) View.inflate(context,R.layout.item_leftmenu,null);
+            TextView textView = (TextView) View.inflate(context, R.layout.item_leftmenu, null);
             textView.setText(data.get(i).getTitle());
             if (position == i) {
                 textView.setEnabled(true);

@@ -10,6 +10,7 @@ import com.example.a18302.guigu_news.MainActivity;
 import com.example.a18302.guigu_news.base.BasePager;
 import com.example.a18302.guigu_news.base.MenuDetailBasePager;
 import com.example.a18302.guigu_news.domain.NewsCenterPagerBean;
+import com.example.a18302.guigu_news.domain.NewsCenterPagerBean2;
 import com.example.a18302.guigu_news.fragment.LeftMenuFragment;
 import com.example.a18302.guigu_news.menudeatailpager.InteracMenuDetailPager;
 import com.example.a18302.guigu_news.menudeatailpager.NewsMenuDetailPager;
@@ -94,8 +95,10 @@ public class NewsCenterPager extends BasePager {
      */
     private void processData(String result) {
         NewsCenterPagerBean bean = parsedJson(result);
+        NewsCenterPagerBean2 bean2 = parsedJson2(result);
         String title = bean.getData().get(0).getChildren().get(1).getTitle();
-        LogUtil.e("使用Gson解析成功" + title);
+        String title2 = bean2.getData().get(0).getChildren().get(1).getTitle();
+        LogUtil.e("使用Gson解析成功" + title2);
 
         //给左侧菜单传值
         data = bean.getData();
@@ -120,6 +123,9 @@ public class NewsCenterPager extends BasePager {
      */
     private NewsCenterPagerBean parsedJson(String json) {
         return new Gson().fromJson(json,NewsCenterPagerBean.class);
+    }
+    private NewsCenterPagerBean2 parsedJson2(String json) {
+        return new Gson().fromJson(json,NewsCenterPagerBean2.class);
     }
 
     /**

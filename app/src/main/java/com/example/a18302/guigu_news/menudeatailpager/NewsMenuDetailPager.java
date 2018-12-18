@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.a18302.guigu_news.base.MenuDetailBasePager;
-import com.example.a18302.guigu_news.pager.NewsCenterPager;
 import com.example.a18302.guigu_news.utils.LogUtil;
 
 public class NewsMenuDetailPager extends MenuDetailBasePager {

@@ -1,8 +1,6 @@
 package com.example.a18302.guigu_news.fragment;
 
-import android.content.Context;
 import android.graphics.Color;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -12,8 +10,8 @@ import android.widget.TextView;
 
 import com.example.a18302.guigu_news.MainActivity;
 import com.example.a18302.guigu_news.R;
-import com.example.a18302.guigu_news.base.BasePager;
 import com.example.a18302.guigu_news.domain.NewsCenterPagerBean;
+import com.example.a18302.guigu_news.domain.NewsCenterPagerBean2;
 import com.example.a18302.guigu_news.pager.NewsCenterPager;
 import com.example.a18302.guigu_news.utils.DensityUtil;
 import com.example.a18302.guigu_news.utils.LogUtil;
@@ -21,7 +19,7 @@ import com.example.a18302.guigu_news.utils.LogUtil;
 import java.util.List;
 
 public class LeftMenuFragment extends BasemenuFragment {
-    private List<NewsCenterPagerBean.DataEntity> data;
+    private List<NewsCenterPagerBean2.DetailPagerData> data;
     private LeftmenuFragmentAdapter adapter;
     private ListView listView;
 
@@ -71,7 +69,7 @@ public class LeftMenuFragment extends BasemenuFragment {
      *
      * @param data
      */
-    public void setData(List<NewsCenterPagerBean.DataEntity> data) {
+    public void setData(List<NewsCenterPagerBean2.DetailPagerData> data) {
         this.data = data;
         for (int i = 0; i < data.size(); i++) {
             LogUtil.e("title==" + data.get(i).getTitle());

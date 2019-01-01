@@ -5,7 +5,7 @@
     android:orientation="vertical">
 
 
-    <ListView
+    <com.example.a18302.guigu_news.view.RefreshListview
         android:id="@+id/listview"
         android:cacheColorHint="@android:color/transparent"
         android:divider="@null"

@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.a18302.guigu_news.R;
 import com.example.a18302.guigu_news.base.MenuDetailBasePager;
@@ -23,6 +24,8 @@ import com.example.a18302.guigu_news.domain.NewsCenterPagerBean2;
 import com.example.a18302.guigu_news.domain.TabDetailPagerBean;
 import com.example.a18302.guigu_news.utils.CacheUtils;
 import com.example.a18302.guigu_news.utils.Contants;
+import com.example.a18302.guigu_news.view.HorizontalScrollViewpager;
+import com.example.a18302.guigu_news.view.RefreshListview;
 import com.google.gson.Gson;
 
 import org.xutils.common.Callback;
@@ -42,10 +45,10 @@ public class TabDetailPager extends MenuDetailBasePager {
 
     private String url;
 
-    private ViewPager viewPager;
+    private HorizontalScrollViewpager viewPager;
     private TextView tv_title;
     private LinearLayout ll_point_group;
-    private ListView listView;
+    private RefreshListview listView;
 
     //之前高亮的位置
     private int position;
@@ -58,6 +61,9 @@ public class TabDetailPager extends MenuDetailBasePager {
     private TabDetailPagerListAdapter tabDetailPagerListAdapter;
 
     private ImageOptions imageOptions;
+
+    private String moreUrl;
+    private boolean isLoadMore = false;
 
     public TabDetailPager(Context context, NewsCenterPagerBean2.DetailPagerData.ChildrenData childrenData) {
         super(context);
@@ -80,14 +86,66 @@ public class TabDetailPager extends MenuDetailBasePager {
         View view = View.inflate(context, R.layout.tabdetail_pager, null);
         listView = view.findViewById(R.id.listview);
 
-        View topnewsView = View.inflate(context,R.layout.topnews,null);
+        View topnewsView = View.inflate(context, R.layout.topnews, null);
         viewPager = topnewsView.findViewById(R.id.viewpager);
         tv_title = topnewsView.findViewById(R.id.tv_title);
         ll_point_group = topnewsView.findViewById(R.id.ll_point_group);
 
         //把顶部轮播图以头的方式添加到listview中
-        listView.addHeaderView(topnewsView);
+//        listView.addHeaderView(topnewsView);
+        listView.addTopNewsView(topnewsView);
+
+        //设置监听下拉刷新
+        listView.setOnOnRefreshListener(new MyOnRefreshListener());
+
         return view;
+    }
+
+    public void getMoreDataFromNet() {
+        RequestParams params = new RequestParams(moreUrl);
+        params.setConnectTimeout(4000);
+        x.http().get(params, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                listView.onRefreshFinish(false);
+                isLoadMore = true;
+                //解析数据
+                ProcessData(result);
+
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+
+            }
+
+            @Override
+            public void onCancelled(CancelledException cex) {
+
+            }
+
+            @Override
+            public void onFinished() {
+
+            }
+        });
+    }
+
+    class MyOnRefreshListener implements RefreshListview.OnRefreshListener {
+
+        @Override
+        public void onPullDownRefresh() {
+            getDataFromNet();
+        }
+
+        @Override
+        public void onLoadMore() {
+            if (TextUtils.isEmpty(moreUrl)) {
+                listView.onRefreshFinish(false);
+            } else {
+                getMoreDataFromNet();
+            }
+        }
     }
 
     @Override
@@ -107,40 +165,60 @@ public class TabDetailPager extends MenuDetailBasePager {
     private void ProcessData(String saveJson) {
         TabDetailPagerBean bean = parseJson(saveJson);
         LogUtil.e(childrenData.getTitle() + "解析成功" + bean.getData().getNews().get(0).getTitle());
-        //顶部轮播图
-        topnews = bean.getData().getTopnews();
-        //viewpager的适配器
-        viewPager.setAdapter(new TabDetailPagerTopNewsAdapter());
 
-        //移除所有的圆点
-        ll_point_group.removeAllViews();
+        moreUrl = "";
+        if (TextUtils.isEmpty(bean.getData().getMore())) {
+            moreUrl = "";
+        } else {
+            moreUrl = Contants.BASE_URL + bean.getData().getMore();
+        }
 
-        for (int i = 0; i < topnews.size(); i++) {
-            ImageView imageView = new ImageView(context);
-            imageView.setBackgroundResource(R.drawable.point_selector);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(DensityUtil.dip2px(8), DensityUtil.dip2px(8));
+        //默认
+        if (!isLoadMore) {
+            //顶部轮播图
+            topnews = bean.getData().getTopnews();
+            //viewpager的适配器
+            viewPager.setAdapter(new TabDetailPagerTopNewsAdapter());
 
-            if (i == 0) {
-                imageView.setEnabled(true);
-            } else {
-                imageView.setEnabled(false);
-                params.leftMargin = DensityUtil.dip2px(8);
+            //移除所有的圆点
+            ll_point_group.removeAllViews();
+
+            for (int i = 0; i < topnews.size(); i++) {
+                ImageView imageView = new ImageView(context);
+                imageView.setBackgroundResource(R.drawable.point_selector);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(DensityUtil.dip2px(8), DensityUtil.dip2px(8));
+
+                if (i == 0) {
+                    imageView.setEnabled(true);
+                } else {
+                    imageView.setEnabled(false);
+                    params.leftMargin = DensityUtil.dip2px(8);
+                }
+
+                imageView.setLayoutParams(params);
+                ll_point_group.addView(imageView);
             }
 
-            imageView.setLayoutParams(params);
-            ll_point_group.addView(imageView);
+
+            //监听页面的改变
+            viewPager.addOnPageChangeListener(new MyOnPageChangeListener());
+            tv_title.setText(topnews.get(0).getTitle());
+
+            //准备listview对应的数据集合
+            news = bean.getData().getNews();
+            //设置listview的适配器
+            tabDetailPagerListAdapter = new TabDetailPagerListAdapter();
+            listView.setAdapter(tabDetailPagerListAdapter);
+        } else {
+            isLoadMore = false;
+            List<TabDetailPagerBean.DataEntity.NewsData> morenews = bean.getData().getNews();
+            //添加到原来集合中
+            news.addAll(morenews);
+            //刷新适配器
+            tabDetailPagerListAdapter.notifyDataSetChanged();
         }
 
 
-        //监听页面的改变
-        viewPager.addOnPageChangeListener(new MyOnPageChangeListener());
-        tv_title.setText(topnews.get(0).getTitle());
-
-        //准备listview对应的数据集合
-        news = bean.getData().getNews();
-        //设置listview的适配器
-        tabDetailPagerListAdapter = new TabDetailPagerListAdapter();
-        listView.setAdapter(tabDetailPagerListAdapter);
     }
 
     class TabDetailPagerListAdapter extends BaseAdapter {
@@ -164,7 +242,7 @@ public class TabDetailPager extends MenuDetailBasePager {
         public View getView(int i, View view, ViewGroup viewGroup) {
             ViewHolder viewHolder;
             if (view == null) {
-                view = View.inflate(context,R.layout.item_tabdetail_pager,null);
+                view = View.inflate(context, R.layout.item_tabdetail_pager, null);
                 viewHolder = new ViewHolder();
                 viewHolder.iv_icon = view.findViewById(R.id.iv_icon);
                 viewHolder.tv_title = view.findViewById(R.id.tv_title);
@@ -177,8 +255,8 @@ public class TabDetailPager extends MenuDetailBasePager {
             //根据位置得到数据
             TabDetailPagerBean.DataEntity.NewsData newsData = news.get(i);
             String imgUrl = Contants.BASE_URL + newsData.getListimage();
-            Log.i("yuanhetao","imgUrl==" + imgUrl);
-            x.image().bind(viewHolder.iv_icon,imgUrl,imageOptions);
+            Log.i("yuanhetao", "imgUrl==" + imgUrl);
+            x.image().bind(viewHolder.iv_icon, imgUrl, imageOptions);
 
             viewHolder.tv_title.setText(newsData.getTitle());
 
@@ -258,16 +336,23 @@ public class TabDetailPager extends MenuDetailBasePager {
 
     private void getDataFromNet() {
         RequestParams params = new RequestParams(url);
+        params.setConnectTimeout(4000);
         x.http().get(params, new Callback.CommonCallback<String>() {
             @Override
             public void onSuccess(String result) {
                 CacheUtils.putString(context, url, result);
                 LogUtil.e(childrenData.getTitle() + "-页面数据请求成功==" + result);
+                ProcessData(result);
+
+                //隐藏下拉刷新控件,重新显示数据，更新时间
+                listView.onRefreshFinish(true);
             }
 
             @Override
             public void onError(Throwable ex, boolean isOnCallback) {
                 LogUtil.e(childrenData.getTitle() + "-页面数据请求失败==" + ex.getMessage());
+                //隐藏下拉刷新，不更新时间，只是隐藏
+                listView.onRefreshFinish(false);
             }
 
             @Override

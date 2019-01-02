@@ -1,6 +1,7 @@
 package com.example.a18302.guigu_news.menudeatailpager.tabdetailpager;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -18,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.a18302.guigu_news.R;
+import com.example.a18302.guigu_news.activity.NewsDetailActivity;
 import com.example.a18302.guigu_news.base.MenuDetailBasePager;
 import com.example.a18302.guigu_news.domain.NewsCenterPagerBean;
 import com.example.a18302.guigu_news.domain.NewsCenterPagerBean2;
@@ -41,6 +44,7 @@ import java.util.List;
  * 页签页面
  */
 public class TabDetailPager extends MenuDetailBasePager {
+    public static final String READ_ARRAY_ID = "read_array_id";
     private final NewsCenterPagerBean2.DetailPagerData.ChildrenData childrenData;
 
     private String url;
@@ -98,8 +102,38 @@ public class TabDetailPager extends MenuDetailBasePager {
         //设置监听下拉刷新
         listView.setOnOnRefreshListener(new MyOnRefreshListener());
 
+        //设置listview的item监听事件
+        listView.setOnItemClickListener(new MyOnItemClickListener());
+
         return view;
     }
+
+    class MyOnItemClickListener implements AdapterView.OnItemClickListener {
+
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+            int realPosition = i - 1;
+            TabDetailPagerBean.DataEntity.NewsData newsData = news.get(realPosition);
+
+            //1.取出保存的id集合
+            String idArray = CacheUtils.getString(context, READ_ARRAY_ID);  //11,22,33,34,35
+            //2.判断是否存在，如果不存在，才保存，并且刷新适配器
+            if (!idArray.contains(newsData.getId() + "")) {
+                CacheUtils.putString(context, READ_ARRAY_ID, idArray + newsData.getId() + ",");
+                //刷新适配器
+                tabDetailPagerListAdapter.notifyDataSetChanged();
+            }
+
+            //跳转到新闻浏览页面
+            Intent intent = new Intent(context,NewsDetailActivity.class);
+            intent.putExtra("url",Contants.BASE_URL + newsData.getUrl());
+            context.startActivity(intent);
+
+
+        }
+    }
+
 
     public void getMoreDataFromNet() {
         RequestParams params = new RequestParams(moreUrl);
@@ -261,6 +295,15 @@ public class TabDetailPager extends MenuDetailBasePager {
             viewHolder.tv_title.setText(newsData.getTitle());
 
             viewHolder.tv_time.setText(newsData.getPubdate());
+
+            String idArray = CacheUtils.getString(context, READ_ARRAY_ID);
+            if (idArray.contains(newsData.getId() + "")) {
+                //设置灰色
+                viewHolder.tv_title.setTextColor(Color.GRAY);
+            } else {
+                //设置黑色
+                viewHolder.tv_title.setTextColor(Color.BLACK);
+            }
             return view;
         }
     }

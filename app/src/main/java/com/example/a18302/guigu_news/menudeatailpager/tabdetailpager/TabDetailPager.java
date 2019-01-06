@@ -3,26 +3,25 @@ package com.example.a18302.guigu_news.menudeatailpager.tabdetailpager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.a18302.guigu_news.R;
 import com.example.a18302.guigu_news.activity.NewsDetailActivity;
 import com.example.a18302.guigu_news.base.MenuDetailBasePager;
-import com.example.a18302.guigu_news.domain.NewsCenterPagerBean;
 import com.example.a18302.guigu_news.domain.NewsCenterPagerBean2;
 import com.example.a18302.guigu_news.domain.TabDetailPagerBean;
 import com.example.a18302.guigu_news.utils.CacheUtils;
@@ -68,6 +67,8 @@ public class TabDetailPager extends MenuDetailBasePager {
 
     private String moreUrl;
     private boolean isLoadMore = false;
+
+    private InternalHandler internalHandler;
 
     public TabDetailPager(Context context, NewsCenterPagerBean2.DetailPagerData.ChildrenData childrenData) {
         super(context);
@@ -126,8 +127,8 @@ public class TabDetailPager extends MenuDetailBasePager {
             }
 
             //跳转到新闻浏览页面
-            Intent intent = new Intent(context,NewsDetailActivity.class);
-            intent.putExtra("url",Contants.BASE_URL + newsData.getUrl());
+            Intent intent = new Intent(context, NewsDetailActivity.class);
+            intent.putExtra("url", Contants.BASE_URL + newsData.getUrl());
             context.startActivity(intent);
 
 
@@ -252,8 +253,35 @@ public class TabDetailPager extends MenuDetailBasePager {
             tabDetailPagerListAdapter.notifyDataSetChanged();
         }
 
+        //发消息每隔4s切换一次viewpager页面
+        if (internalHandler == null) {
+            internalHandler = new InternalHandler();
+        }
+        //把消息队列所有的消息和回调移除
+        internalHandler.removeCallbacksAndMessages(null);
+        internalHandler.postDelayed(new MyEunnable(), 4000);
 
     }
+
+    class MyEunnable implements Runnable {
+
+        @Override
+        public void run() {
+            internalHandler.sendEmptyMessage(0);
+        }
+    }
+
+    class InternalHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            //切换viewpager的下一个页面
+            int item = (viewPager.getCurrentItem() + 1)%topnews.size();
+            viewPager.setCurrentItem(item);
+            internalHandler.postDelayed(new MyEunnable(),4000);
+        }
+    }
+
 
     class TabDetailPagerListAdapter extends BaseAdapter {
 
@@ -332,9 +360,22 @@ public class TabDetailPager extends MenuDetailBasePager {
             position = i;
         }
 
+        private boolean isDragging = false;
         @Override
         public void onPageScrollStateChanged(int i) {
+            if (i == ViewPager.SCROLL_STATE_DRAGGING) { //拖拽
+                isDragging = true;
+                //移除
+                internalHandler.removeCallbacksAndMessages(null);
+            }else if (i == ViewPager.SCROLL_STATE_SETTLING) { //惯性
+                isDragging = false;
+                internalHandler.removeCallbacksAndMessages(null);
+                internalHandler.postDelayed(new MyEunnable(),4000);
 
+            }else if (i == ViewPager.SCROLL_STATE_IDLE) {  //静止状态
+                isDragging = false;
+
+            }
         }
     }
 
@@ -351,6 +392,27 @@ public class TabDetailPager extends MenuDetailBasePager {
             TabDetailPagerBean.DataEntity.TopnewsData topnewsData = topnews.get(position);
             String imgUrl = Contants.BASE_URL + topnewsData.getTopimage();
             x.image().bind(imageView, imgUrl);
+
+            imageView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    switch (motionEvent.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            internalHandler.removeCallbacksAndMessages(null);
+                            break;
+                        case MotionEvent.ACTION_UP:
+                            internalHandler.removeCallbacksAndMessages(null);
+                            internalHandler.postDelayed(new MyEunnable(),4000);
+                            break;
+//                        case MotionEvent.ACTION_CANCEL:
+//                           internalHandler.removeCallbacksAndMessages(null);
+//                           internalHandler.postDelayed(new MyEunnable(),4000);
+//                           break;
+                    }
+
+                    return true;
+                }
+            });
 
             return imageView;
         }

@@ -7,6 +7,14 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
 
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HttpHeaderParser;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.a18302.guigu_news.MainActivity;
 import com.example.a18302.guigu_news.base.BasePager;
 import com.example.a18302.guigu_news.base.MenuDetailBasePager;
@@ -30,6 +38,7 @@ import org.xutils.common.Callback;
 import org.xutils.http.RequestParams;
 import org.xutils.x;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,12 +79,49 @@ public class NewsCenterPager extends BasePager {
         //绑定数据
         textView.setText("我是新闻中心内容");
         //获取缓存数据
-        String saveJson = CacheUtils.getString(context,Contants.NEWSCENTER_PAGER_URL);
+        String saveJson = CacheUtils.getString(context, Contants.NEWSCENTER_PAGER_URL);
         if (!TextUtils.isEmpty(saveJson)) {
             processData(saveJson);
         }
         //联网请求数据
-        getDataFromNet();
+//        getDataFromNet();
+        getDataFromNetByVolley();
+    }
+
+    /**
+     * 使用volley请求数据
+     */
+    private void getDataFromNetByVolley() {
+        RequestQueue queue = Volley.newRequestQueue(context);
+
+        StringRequest request = new StringRequest(Request.Method.GET, Contants.NEWSCENTER_PAGER_URL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String result) {
+                //缓存数据
+                CacheUtils.putString(context, NEWSCENTER_PAGER_URL, result);
+
+                processData(result);
+                //设置适配器
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+
+            }
+        }) {
+            @Override
+            protected Response<String> parseNetworkResponse(NetworkResponse response) {
+                try {
+                    String parsed = new String(response.data,"UTF-8");
+                    return Response.success(parsed, HttpHeaderParser.parseCacheHeaders(response));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                return super.parseNetworkResponse(response);
+            }
+        };
+        //添加到队列
+        queue.add(request);
     }
 
     private void getDataFromNet() {
@@ -85,7 +131,7 @@ public class NewsCenterPager extends BasePager {
             public void onSuccess(String result) {
                 LogUtil.e("使用xutils3联网请求成功==" + result);
                 //缓存数据
-                CacheUtils.putString(context,NEWSCENTER_PAGER_URL,result);
+                CacheUtils.putString(context, NEWSCENTER_PAGER_URL, result);
 
                 processData(result);
                 //设置适配器
@@ -128,8 +174,8 @@ public class NewsCenterPager extends BasePager {
         LeftMenuFragment leftMenuFragment = mainActivity.getLeftMenuFragment();
         //添加详情页面
         detailBasePagers = new ArrayList<>();
-        detailBasePagers.add(new NewsMenuDetailPager(context,data.get(0)));
-        detailBasePagers.add(new TopicMenuDetailPager(context,data.get(0)));
+        detailBasePagers.add(new NewsMenuDetailPager(context, data.get(0)));
+        detailBasePagers.add(new TopicMenuDetailPager(context, data.get(0)));
         detailBasePagers.add(new PhotosMenuDetailPager(context));
         detailBasePagers.add(new InteracMenuDetailPager(context));
         //把数据传递给左侧菜单

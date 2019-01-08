@@ -28,6 +28,7 @@ import com.example.a18302.guigu_news.menudeatailpager.TopicMenuDetailPager;
 import com.example.a18302.guigu_news.utils.CacheUtils;
 import com.example.a18302.guigu_news.utils.Contants;
 import com.example.a18302.guigu_news.utils.LogUtil;
+import com.example.a18302.guigu_news.volley.VolleyManager;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 
@@ -89,16 +90,20 @@ public class NewsCenterPager extends BasePager {
     }
 
     /**
-     * 使用volley请求数据
+     * 使用Volley联网请求数据
      */
     private void getDataFromNetByVolley() {
-        RequestQueue queue = Volley.newRequestQueue(context);
-
+        //请求队列
+//        RequestQueue queue = Volley.newRequestQueue(context);
+        //String请求
         StringRequest request = new StringRequest(Request.Method.GET, Contants.NEWSCENTER_PAGER_URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String result) {
+
+                LogUtil.e("Volley--passTime==" + result);
+                LogUtil.e("使用Volley联网请求成功==" + result);
                 //缓存数据
-                CacheUtils.putString(context, NEWSCENTER_PAGER_URL, result);
+                CacheUtils.putString(context,Contants.NEWSCENTER_PAGER_URL,result);
 
                 processData(result);
                 //设置适配器
@@ -106,13 +111,13 @@ public class NewsCenterPager extends BasePager {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-
+                LogUtil.e("使用Volley联网请求失败==" + volleyError.getMessage());
             }
-        }) {
+        }){
             @Override
             protected Response<String> parseNetworkResponse(NetworkResponse response) {
                 try {
-                    String parsed = new String(response.data,"UTF-8");
+                    String  parsed = new String(response.data, "UTF-8");
                     return Response.success(parsed, HttpHeaderParser.parseCacheHeaders(response));
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
@@ -120,8 +125,11 @@ public class NewsCenterPager extends BasePager {
                 return super.parseNetworkResponse(response);
             }
         };
+
         //添加到队列
-        queue.add(request);
+        VolleyManager.getRequestQueue().add(request);
+
+
     }
 
     private void getDataFromNet() {
@@ -176,7 +184,7 @@ public class NewsCenterPager extends BasePager {
         detailBasePagers = new ArrayList<>();
         detailBasePagers.add(new NewsMenuDetailPager(context, data.get(0)));
         detailBasePagers.add(new TopicMenuDetailPager(context, data.get(0)));
-        detailBasePagers.add(new PhotosMenuDetailPager(context));
+        detailBasePagers.add(new PhotosMenuDetailPager(context,data.get(2)));
         detailBasePagers.add(new InteracMenuDetailPager(context));
         //把数据传递给左侧菜单
         leftMenuFragment.setData(data);
@@ -291,5 +299,12 @@ public class NewsCenterPager extends BasePager {
         detailBasePager.initData();
 
         fl_content.addView(rootView);
+
+        if (i == 2) {
+            //图组详情
+            ib_switch_list_grid.setVisibility(View.VISIBLE);
+        } else {
+            ib_switch_list_grid.setVisibility(View.GONE);
+        }
     }
 }

@@ -10,12 +10,18 @@
         android:orientation="horizontal">
 
 
-        <com.viewpagerindicator.TabPageIndicator
-            android:id="@+id/tabPageIndicator"
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tablayout"
             android:layout_gravity="center_vertical"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content" />
+        <!--<com.viewpagerindicator.TabPageIndicator-->
+            <!--android:id="@+id/tabPageIndicator"-->
+            <!--android:layout_gravity="center_vertical"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_weight="1"-->
+            <!--android:layout_height="wrap_content" />-->
 
         <ImageButton
             android:layout_marginLeft="8dp"

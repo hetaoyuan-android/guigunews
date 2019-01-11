@@ -1,26 +1,22 @@
 package com.example.a18302.guigu_news.menudeatailpager;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.TextView;
 
 import com.example.a18302.guigu_news.MainActivity;
 import com.example.a18302.guigu_news.R;
 import com.example.a18302.guigu_news.base.MenuDetailBasePager;
 import com.example.a18302.guigu_news.domain.NewsCenterPagerBean2;
-import com.example.a18302.guigu_news.menudeatailpager.tabdetailpager.TabDetailPager;
 import com.example.a18302.guigu_news.menudeatailpager.tabdetailpager.TopicTabDetailPager;
 import com.example.a18302.guigu_news.utils.LogUtil;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
-import com.viewpagerindicator.TabPageIndicator;
 
 import org.xutils.view.annotation.ViewInject;
 import org.xutils.x;
@@ -31,8 +27,8 @@ import java.util.List;
 public class TopicMenuDetailPager extends MenuDetailBasePager {
 
 
-    @ViewInject(R.id.tabPageIndicator)
-    private TabPageIndicator tabPageIndicator;
+    @ViewInject(R.id.tablayout)
+    private TabLayout tablayout;
 
     @ViewInject(R.id.viewpager)
     private ViewPager viewPager;
@@ -77,10 +73,12 @@ public class TopicMenuDetailPager extends MenuDetailBasePager {
         //设置viewpager的适配器
         viewPager.setAdapter(new TopicMenuDetailPager.MyNewMenuDetailPagerAdapter());
         //viewpager和tabPagerIndiacator的关联
-        tabPageIndicator.setViewPager(viewPager);
-
+//        tabPageIndicator.setViewPager(viewPager);
+        tablayout.setupWithViewPager(viewPager);
         //注意监听页面的变化，TabPageIndicator监听页面变化
-        tabPageIndicator.setOnPageChangeListener(new TopicMenuDetailPager.MyOnChangeListener());
+//        tabPageIndicator.setOnPageChangeListener(new TopicMenuDetailPager.MyOnChangeListener());
+            viewPager.addOnPageChangeListener(new MyOnChangeListener());
+            tablayout.setTabMode(TabLayout.MODE_SCROLLABLE);
     }
 
 

@@ -30,4 +30,6 @@ dependencies {
     implementation files('libs/gson-2.2.1.jar')
     implementation project(':ViewPagerIndicator_library')
     implementation project(':PullToRefresh_library')
+    implementation files('libs/volley.jar')
+    implementation 'com.android.support:design:28.0.0'
 }

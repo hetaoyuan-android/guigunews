@@ -6,9 +6,12 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.a18302.guigu_news.MainActivity;
 import com.example.a18302.guigu_news.R;
@@ -79,8 +82,23 @@ public class TopicMenuDetailPager extends MenuDetailBasePager {
 //        tabPageIndicator.setOnPageChangeListener(new TopicMenuDetailPager.MyOnChangeListener());
             viewPager.addOnPageChangeListener(new MyOnChangeListener());
             tablayout.setTabMode(TabLayout.MODE_SCROLLABLE);
-    }
 
+//        for (int i = 0; i < tablayout.getTabCount(); i++) {
+//            TabLayout.Tab tab = tablayout.getTabAt(i);
+//            tab.setCustomView(getTabView(i));
+//        }
+//        viewPager.setCurrentItem(tempPositon);
+    }
+//    private int tempPositon = 0 ;
+
+    public View getTabView(int position){
+        View view = LayoutInflater.from(context).inflate(R.layout.tab_item, null);
+        TextView tv= (TextView) view.findViewById(R.id.textView);
+        tv.setText(children.get(position).getTitle());
+        ImageView img = (ImageView) view.findViewById(R.id.imageView);
+        img.setImageResource(R.drawable.dot_focus);
+        return view;
+    }
 
     private void isEnableSlideMenu(int touchmodeFullScreen) {
         MainActivity mainActivity = (MainActivity) context;

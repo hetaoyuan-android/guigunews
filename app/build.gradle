@@ -32,4 +32,6 @@ dependencies {
     implementation project(':PullToRefresh_library')
     implementation files('libs/volley.jar')
     implementation 'com.android.support:design:28.0.0'
+    implementation files('libs/picasso-2.5.2.jar')
+    implementation project(':PhotoView_library')
 }

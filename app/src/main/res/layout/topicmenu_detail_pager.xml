@@ -13,6 +13,7 @@
         <android.support.design.widget.TabLayout
             android:id="@+id/tablayout"
             android:layout_gravity="center_vertical"
+            style="@style/MyCustomeTablayout"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content" />

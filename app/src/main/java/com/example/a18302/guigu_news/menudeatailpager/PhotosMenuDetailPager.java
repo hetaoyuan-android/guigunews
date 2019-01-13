@@ -1,14 +1,17 @@
 package com.example.a18302.guigu_news.menudeatailpager;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -23,6 +26,7 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.a18302.guigu_news.R;
+import com.example.a18302.guigu_news.activity.ShowImageActivity;
 import com.example.a18302.guigu_news.base.MenuDetailBasePager;
 import com.example.a18302.guigu_news.domain.NewsCenterPagerBean2;
 import com.example.a18302.guigu_news.domain.PhotosMenuDetailPagerBean;
@@ -47,7 +51,7 @@ public class PhotosMenuDetailPager extends MenuDetailBasePager {
     private ListView listView;
 
     @ViewInject(R.id.gridview)
-    private GridView gridView;
+    private GridView gridview;
 
     private String url;
 
@@ -68,14 +72,32 @@ public class PhotosMenuDetailPager extends MenuDetailBasePager {
     protected View initView() {
         View view = View.inflate(context, R.layout.photos_menudetail_pager, null);
         x.view().inject(this, view);
+        //设置点击某条的item的监听
+        listView.setOnItemClickListener(new MyOnItemClickListener());
+        gridview.setOnItemClickListener(new MyOnItemClickListener());
         return view;
+    }
+
+    class MyOnItemClickListener implements AdapterView.OnItemClickListener {
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+
+            PhotosMenuDetailPagerBean.DataEntity.NewsEntity newsEntity = news.get(position);
+            String imageUrl = Contants.BASE_URL+newsEntity.getLargeimage();
+            Intent intent = new Intent(context, ShowImageActivity.class);
+            intent.putExtra("url",imageUrl);
+            context.startActivity(intent);
+        }
     }
 
     @Override
     public void initData() {
         super.initData();
         LogUtil.e("图组详情页面数据被初始化了");
-        url = Contants.BASE_URL + detailPagerData.getUrl1();
+        url = Contants.BASE_URL + detailPagerData.getUrl();
+        Log.i("yuanhteao","url" + detailPagerData.getUrl());
         String saveJson = CacheUtils.getString(context, url);
         if (!TextUtils.isEmpty(saveJson)) {
             processData(saveJson);
@@ -211,5 +233,36 @@ public class PhotosMenuDetailPager extends MenuDetailBasePager {
             }
         };
         VolleyManager.getImageLoader().get(imageurl, listener);
+    }
+
+
+    /**
+     * true,显示ListView，隐藏GridView
+     * false,显示GridView,隐藏ListView
+     */
+    private boolean isShowListView = true;
+
+    public void swichListAndGrid(ImageButton ib_swich_list_grid) {
+        if(isShowListView){
+            isShowListView = false;
+            //显示GridView,隐藏ListView
+            gridview.setVisibility(View.VISIBLE);
+            adapter = new PhotoMenuDetailPagerAdapter();
+            gridview.setAdapter(adapter);
+            listView.setVisibility(View.GONE);
+            //按钮显示--ListView
+            ib_swich_list_grid.setImageResource(R.drawable.icon_pic_list_type);
+
+
+        }else{
+            isShowListView = true;
+            //显示ListView，隐藏GridView
+            listView.setVisibility(View.VISIBLE);
+            adapter = new PhotoMenuDetailPagerAdapter();
+            listView.setAdapter(adapter);
+            gridview.setVisibility(View.GONE);
+            //按钮显示--GridView
+            ib_swich_list_grid.setImageResource(R.drawable.icon_pic_grid_type);
+        }
     }
 }

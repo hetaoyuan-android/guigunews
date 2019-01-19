@@ -25,6 +25,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.StringRequest;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.a18302.guigu_news.R;
 import com.example.a18302.guigu_news.activity.ShowImageActivity;
 import com.example.a18302.guigu_news.base.MenuDetailBasePager;
@@ -36,6 +38,7 @@ import com.example.a18302.guigu_news.utils.Contants;
 import com.example.a18302.guigu_news.utils.LogUtil;
 import com.example.a18302.guigu_news.volley.VolleyManager;
 import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
 
 import org.xutils.view.annotation.ViewInject;
 import org.xutils.x;
@@ -233,6 +236,19 @@ public class InteracMenuDetailPager extends MenuDetailBasePager {
             if (bitmap != null) {
                 viewHolder.iv_icon.setImageBitmap(bitmap);
             }
+//            //Picasso请求图片
+//            Picasso.with(context)
+//                    .load(imageUrl)
+//                    .placeholder(R.drawable.home_scroll_default)
+//                    .error(R.drawable.home_scroll_default)
+//                    .into(viewHolder.iv_icon);
+            //Glide请求图片
+//            Glide.with(context)
+//                    .load(imageUrl)
+//                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+//                    .placeholder(R.drawable.home_scroll_default)
+//                    .error(R.drawable.home_scroll_default)
+//                    .into(viewHolder.iv_icon);
             return view;
         }
     }

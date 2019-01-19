@@ -34,4 +34,5 @@ dependencies {
     implementation 'com.android.support:design:28.0.0'
     implementation files('libs/picasso-2.5.2.jar')
     implementation project(':PhotoView_library')
+    implementation files('libs/glide-3.7.0.jar')
 }

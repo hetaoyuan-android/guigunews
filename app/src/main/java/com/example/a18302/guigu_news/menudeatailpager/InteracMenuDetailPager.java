@@ -1,6 +1,5 @@
 package com.example.a18302.guigu_news.menudeatailpager;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -25,8 +24,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.StringRequest;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.a18302.guigu_news.R;
 import com.example.a18302.guigu_news.activity.ShowImageActivity;
 import com.example.a18302.guigu_news.base.MenuDetailBasePager;
@@ -38,6 +35,8 @@ import com.example.a18302.guigu_news.utils.Contants;
 import com.example.a18302.guigu_news.utils.LogUtil;
 import com.example.a18302.guigu_news.volley.VolleyManager;
 import com.google.gson.Gson;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 import com.squareup.picasso.Picasso;
 
 import org.xutils.view.annotation.ViewInject;
@@ -196,6 +195,20 @@ public class InteracMenuDetailPager extends MenuDetailBasePager {
     }
 
     class PhotoMenuDetailPagerAdapter extends BaseAdapter {
+        private DisplayImageOptions options;
+
+        public PhotoMenuDetailPagerAdapter() {
+            options = new DisplayImageOptions.Builder()
+                    .showImageOnLoading(R.drawable.home_scroll_default)
+                    .showImageForEmptyUri(R.drawable.home_scroll_default)
+                    .showImageOnFail(R.drawable.home_scroll_default)
+                    .cacheInMemory(true)
+                    .cacheOnDisk(true)
+                    .considerExifParams(true)
+                    .bitmapConfig(Bitmap.Config.RGB_565)
+                    .displayer(new RoundedBitmapDisplayer(10))//设置矩形圆角
+                    .build();
+        }
 
         @Override
         public int getCount() {
@@ -249,6 +262,7 @@ public class InteracMenuDetailPager extends MenuDetailBasePager {
 //                    .placeholder(R.drawable.home_scroll_default)
 //                    .error(R.drawable.home_scroll_default)
 //                    .into(viewHolder.iv_icon);
+            com.nostra13.universalimageloader.core.ImageLoader.getInstance().displayImage(imageUrl,viewHolder.iv_icon,options);
             return view;
         }
     }
